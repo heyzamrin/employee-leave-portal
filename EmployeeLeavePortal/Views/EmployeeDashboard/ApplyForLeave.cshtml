@@ -1,0 +1,682 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Apply for Leave";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var leaveTypes =
+        ViewBag.LeaveTypes as List<SelectListItem>
+        ?? new List<SelectListItem>();
+}
+
+
+<style>
+    .apply-page {
+        padding: 28px 0 45px;
+        color: #f4f6ff;
+    }
+
+    .apply-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .apply-eyebrow {
+        color: #a99cff;
+        font-size: 11px;
+        font-weight: 750;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .apply-header h2 {
+        color: #f7f8ff;
+        font-size: clamp(26px, 3vw, 32px);
+        font-weight: 750;
+        letter-spacing: -.8px;
+        margin: 0 0 8px;
+    }
+
+    .apply-header p {
+        color: #a4b2d0;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .apply-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 16px;
+        border: 1px solid #30405f;
+        border-radius: 9px;
+        background: #101a30;
+        color: #dce5fa;
+        font-size: 13px;
+        font-weight: 650;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .apply-back-btn:hover {
+            border-color: #8170ff;
+            color: #c8c0ff;
+            background: #15203a;
+        }
+
+    .apply-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .apply-form-card,
+    .apply-info-card {
+        background: linear-gradient(145deg, #0d162a, #0b1324);
+        border: 1px solid #263451;
+        border-radius: 13px;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, .16);
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .apply-card-header {
+        padding: 23px 26px;
+        border-bottom: 1px solid #1d2942;
+        background: rgba(15, 25, 45, .72);
+    }
+
+        .apply-card-header h5 {
+            color: #f4f6ff;
+            font-size: 17px;
+            font-weight: 750;
+            margin: 0 0 6px;
+        }
+
+        .apply-card-header p {
+            color: #a4b2d0;
+            font-size: 13px;
+            margin: 0;
+        }
+
+    .apply-form-body {
+        padding: 26px;
+    }
+
+    .apply-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #e7ebfa;
+        font-size: 14px;
+        font-weight: 750;
+        margin-bottom: 18px;
+    }
+
+    .apply-section-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 29px;
+        height: 29px;
+        flex-shrink: 0;
+        border-radius: 9px;
+        background: rgba(129, 112, 255, .17);
+        border: 1px solid rgba(129, 112, 255, .32);
+        color: #bcb2ff;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .apply-field {
+        margin-bottom: 22px;
+    }
+
+        .apply-field label {
+            display: block;
+            color: #dce5fa;
+            font-size: 13px;
+            font-weight: 650;
+            margin-bottom: 9px;
+        }
+
+        .apply-field .form-control,
+        .apply-field .form-select {
+            width: 100%;
+            min-height: 47px;
+            border: 1px solid #30405f;
+            border-radius: 9px;
+            background-color: #0a1325;
+            color: #f4f6ff;
+            font-size: 13px;
+            padding: 12px 14px;
+            box-shadow: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .apply-field textarea.form-control {
+            min-height: 125px;
+            resize: vertical;
+        }
+
+        .apply-field .form-control:focus,
+        .apply-field .form-select:focus {
+            border-color: #8170ff;
+            background-color: #0d172c;
+            color: #f4f6ff;
+            box-shadow: 0 0 0 3px rgba(129, 112, 255, .14);
+            outline: none;
+        }
+
+        .apply-field .form-control::placeholder {
+            color: #7182a4;
+        }
+
+        .apply-field .form-select option {
+            background: #0c1427;
+            color: #f4f6ff;
+        }
+
+        .apply-field input[type="date"] {
+            color-scheme: dark;
+        }
+
+    .apply-help {
+        color: #8f9fbe;
+        font-size: 11px;
+        margin-top: 7px;
+        line-height: 1.6;
+    }
+
+    .apply-divider {
+        border: 0;
+        border-top: 1px solid #1d2942;
+        margin: 8px 0 25px;
+        opacity: 1;
+    }
+
+    .apply-form-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-top: 22px;
+        border-top: 1px solid #1d2942;
+        margin-top: 5px;
+    }
+
+    .apply-submit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 45px;
+        padding: 11px 19px;
+        background: linear-gradient(135deg, #9182ff, #6c5ce7);
+        color: #fff;
+        border: 1px solid #8b7cff;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 7px 22px rgba(111, 91, 255, .18);
+        transition: .2s ease;
+    }
+
+        .apply-submit-btn:hover {
+            background: linear-gradient(135deg, #a296ff, #7a6cf0);
+            border-color: #a69bff;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 9px 26px rgba(111, 91, 255, .28);
+        }
+
+    .apply-cancel-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 45px;
+        padding: 11px 18px;
+        background: #111c32;
+        color: #dce5fa;
+        border: 1px solid #30405f;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 650;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .apply-cancel-btn:hover {
+            background: #182541;
+            border-color: #596a95;
+            color: #fff;
+        }
+
+    /* Information card */
+
+    .apply-info-banner {
+        padding: 22px;
+        background: linear-gradient(145deg, #28245f, #5146b9 55%, #6555d9);
+        border-bottom: 1px solid rgba(169, 156, 255, .2);
+        color: #fff;
+    }
+
+    .apply-info-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, .24);
+        background: rgba(255, 255, 255, .12);
+        border-radius: 12px;
+        font-size: 21px;
+        margin-bottom: 18px;
+    }
+
+    .apply-info-banner h5 {
+        color: #fff;
+        font-size: 17px;
+        font-weight: 750;
+        margin: 0 0 9px;
+    }
+
+    .apply-info-banner p {
+        color: rgba(255, 255, 255, .83);
+        font-size: 12px;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .apply-info-content {
+        padding: 22px;
+    }
+
+        .apply-info-content h6 {
+            color: #f0f3ff;
+            font-size: 13px;
+            font-weight: 750;
+            margin-bottom: 18px;
+        }
+
+    .apply-guideline {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        margin-bottom: 19px;
+    }
+
+        .apply-guideline:last-child {
+            margin-bottom: 0;
+        }
+
+    .apply-guideline-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 29px;
+        height: 29px;
+        border-radius: 9px;
+        background: rgba(129, 112, 255, .16);
+        border: 1px solid rgba(129, 112, 255, .24);
+        color: #bcb2ff;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .apply-guideline strong {
+        display: block;
+        color: #e5eaff;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .apply-guideline span {
+        display: block;
+        color: #a4b2d0;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .apply-pending-note {
+        padding: 13px;
+        border-radius: 9px;
+        background: rgba(246, 189, 96, .09);
+        border: 1px solid rgba(246, 189, 96, .22);
+        color: #f5d18b;
+        font-size: 11px;
+        line-height: 1.7;
+        margin-top: 22px;
+    }
+
+    .apply-alert {
+        border-radius: 9px;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .apply-page .alert-success {
+        background: rgba(28, 133, 100, .15);
+        border: 1px solid rgba(67, 217, 163, .28);
+        color: #8cebc9;
+    }
+
+    .apply-page .alert-danger {
+        background: rgba(190, 48, 73, .15);
+        border: 1px solid rgba(255, 99, 125, .28);
+        color: #ff9bab;
+    }
+
+    .apply-page .text-danger {
+        color: #ff8195 !important;
+    }
+
+    @@media (max-width: 991px) {
+        .apply-layout {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .apply-info-column {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .apply-info-card {
+            height: 100%;
+        }
+    }
+
+    @@media (max-width: 575px) {
+        .apply-page {
+            padding-top: 18px;
+        }
+
+        .apply-form-body {
+            padding: 20px;
+        }
+
+        .apply-card-header {
+            padding: 20px;
+        }
+
+        .apply-info-column {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .apply-form-footer {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .apply-submit-btn,
+        .apply-cancel-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container-fluid apply-page">
+
+    <div class="apply-header">
+        <div>
+            <div class="apply-eyebrow">Employee self-service</div>
+            <h2>Apply for Leave</h2>
+            <p>Plan your time off by submitting a leave application.</p>
+        </div>
+
+        <a asp-controller="EmployeeDashboard"
+           asp-action="MyLeaveRequests"
+           class="apply-back-btn">
+            <span aria-hidden="true">←</span>
+            My Leave Requests
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success apply-alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div asp-validation-summary="All"
+             class="alert alert-danger apply-alert">
+        </div>
+    }
+
+    <div class="apply-layout">
+
+        <div class="apply-form-card">
+
+            <div class="apply-card-header">
+                <h5>Leave application form</h5>
+                <p>Complete all required fields marked with an asterisk (*).</p>
+            </div>
+
+            <div class="apply-form-body">
+
+                <form asp-controller="EmployeeDashboard"
+                      asp-action="ApplyForLeave"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="apply-section-title">
+                        <span class="apply-section-number">01</span>
+                        Leave details
+                    </div>
+
+                    <div class="apply-field">
+                        <label for="LeaveTypeId">
+                            Leave type <span class="text-danger">*</span>
+                        </label>
+
+                        <select id="LeaveTypeId"
+                                name="LeaveTypeId"
+                                class="form-select"
+                                required>
+
+                            <option value="">Select a leave type</option>
+
+                            @foreach (var item in leaveTypes)
+                            {
+                                if (item.Value ==
+                                Convert.ToString(ViewBag.SelectedLeaveTypeId))
+                                {
+                                    <option value="@item.Value" selected>
+                                        @item.Text
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">
+                                        @item.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+
+                        <div class="apply-help">
+                            Choose the leave category you want to apply for.
+                        </div>
+                    </div>
+
+                    <hr class="apply-divider" />
+
+                    <div class="apply-section-title">
+                        <span class="apply-section-number">02</span>
+                        Leave duration
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="apply-field">
+                                <label for="FromDate">
+                                    Start date <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="date"
+                                       id="FromDate"
+                                       name="FromDate"
+                                       class="form-control"
+                                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                       value="@ViewBag.FromDate"
+                                       required />
+
+                                <div class="apply-help">
+                                    First day of your leave.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="apply-field">
+                                <label for="ToDate">
+                                    End date <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="date"
+                                       id="ToDate"
+                                       name="ToDate"
+                                       class="form-control"
+                                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                       value="@ViewBag.ToDate"
+                                       required />
+
+                                <div class="apply-help">
+                                    Last day of your leave.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="apply-divider" />
+
+                    <div class="apply-section-title">
+                        <span class="apply-section-number">03</span>
+                        Reason for leave
+                    </div>
+
+                    <div class="apply-field">
+                        <label for="Reason">
+                            Reason <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea id="Reason"
+                                  name="Reason"
+                                  class="form-control"
+                                  rows="5"
+                                  maxlength="500"
+                                  placeholder="Briefly explain why you need leave..."
+                                  required>@ViewBag.Reason</textarea>
+
+                        <div class="apply-help">
+                            Enter a clear reason, up to 500 characters.
+                        </div>
+                    </div>
+
+                    <div class="apply-form-footer">
+                        <a asp-controller="EmployeeDashboard"
+                           asp-action="EmployeeDashboardPageLoad"
+                           class="apply-cancel-btn">
+                            Cancel
+                        </a>
+
+                        <button type="submit" class="apply-submit-btn">
+                            Submit Application
+                            <span aria-hidden="true">→</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="apply-info-column">
+
+            <div class="apply-info-card">
+                <div class="apply-info-banner">
+                    <div class="apply-info-icon" aria-hidden="true">✦</div>
+                    <h5>Taking time off?</h5>
+                    <p>
+                        Submit your request with the correct dates and
+                        a clear reason to help your administrator review it.
+                    </p>
+                </div>
+
+                <div class="apply-info-content">
+                    <h6>Before you submit</h6>
+
+                    <div class="apply-guideline">
+                        <div class="apply-guideline-icon">1</div>
+                        <div>
+                            <strong>Choose leave type</strong>
+                            <span>Select the appropriate leave category.</span>
+                        </div>
+                    </div>
+
+                    <div class="apply-guideline">
+                        <div class="apply-guideline-icon">2</div>
+                        <div>
+                            <strong>Check your dates</strong>
+                            <span>Make sure your start date is on or before your end date.</span>
+                        </div>
+                    </div>
+
+                    <div class="apply-guideline">
+                        <div class="apply-guideline-icon">3</div>
+                        <div>
+                            <strong>Explain your reason</strong>
+                            <span>Provide enough detail for the reviewer.</span>
+                        </div>
+                    </div>
+
+                    <div class="apply-pending-note">
+                        <strong>Note:</strong> Submitting a request does not
+                        mean it is approved. Your application will initially
+                        have a Pending status.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const fromDateInput = document.getElementById("FromDate");
+        const toDateInput = document.getElementById("ToDate");
+
+        if (fromDateInput && toDateInput) {
+            fromDateInput.addEventListener("change", function () {
+                toDateInput.min = this.value;
+
+                if (toDateInput.value && toDateInput.value < this.value) {
+                    toDateInput.value = this.value;
+                }
+            });
+
+            toDateInput.addEventListener("change", function () {
+                if (fromDateInput.value) {
+                    toDateInput.min = fromDateInput.value;
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,226 @@
+﻿@using System
+@using System.Data
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admin Dashboard";
+
+    DataTable pendingAdminRequests =
+        ViewBag.PendingAdminRequestsTable as DataTable
+        ?? new DataTable();
+
+    int pendingAdmins = ViewBag.PendingAdminRequests != null
+        ? Convert.ToInt32(ViewBag.PendingAdminRequests)
+        : 0;
+
+    int totalEmployees = ViewBag.TotalEmployees != null
+        ? Convert.ToInt32(ViewBag.TotalEmployees)
+        : 0;
+
+    int pendingLeaves = ViewBag.PendingLeaves != null
+        ? Convert.ToInt32(ViewBag.PendingLeaves)
+        : 0;
+
+    int approvedLeaves = ViewBag.ApprovedLeaves != null
+        ? Convert.ToInt32(ViewBag.ApprovedLeaves)
+        : 0;
+}
+
+<div class="page-heading">
+    <div>
+        <h1>Hello, @User.Identity?.Name!</h1>
+        <p>Here is your employee leave management overview.</p>
+    </div>
+
+    <a class="btn btn-primary"
+       asp-controller="AdminApproval"
+       asp-action="AdminApprovalPageLoad">
+        Review Admin Requests
+    </a>
+</div>
+
+<div class="stats-grid">
+
+    <a class="stat-card"
+       asp-controller="Employee"
+       asp-action="EmployeeList"
+       style="text-decoration:none; color:inherit;">
+        <div class="stat-top">
+            Total Employees
+            <span class="stat-icon">♙</span>
+        </div>
+        <div class="stat-number">@totalEmployees</div>
+        <div class="stat-note">Registered employees — View list</div>
+    </a>
+
+    <a class="stat-card"
+       asp-controller="AdminApproval"
+       asp-action="PendingLeaveRequestsPageLoad"
+       style="text-decoration:none; color:inherit;">
+        <div class="stat-top">
+            Pending Leave Requests
+            <span class="stat-icon">◷</span>
+        </div>
+        <div class="stat-number">@pendingLeaves</div>
+        <div class="stat-note">Awaiting review — View requests</div>
+    </a>
+
+    <a class="stat-card"
+       asp-controller="AdminApproval"
+       asp-action="ApprovedLeaveRequestsPageLoad"
+       style="text-decoration:none; color:inherit;">
+        <div class="stat-top">
+            Approved Leave Requests
+            <span class="stat-icon">✓</span>
+        </div>
+        <div class="stat-number">@approvedLeaves</div>
+        <div class="stat-note">Approved applications — View requests</div>
+    </a>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            Pending Admin Requests
+            <span class="stat-icon">♧</span>
+        </div>
+        <div class="stat-number">@pendingAdmins</div>
+        <div class="stat-note">Awaiting admin approval</div>
+    </div>
+
+</div>
+
+<div class="content-grid">
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Leave Management</h2>
+            <a asp-controller="Employee"
+               asp-action="EmployeeList">View Employees →</a>
+        </div>
+
+        <div class="panel-body">
+            <div class="quick-actions">
+
+                <a class="quick-action"
+                   asp-controller="Employee"
+                   asp-action="EmployeeList">
+                    <strong>♙ Employee Management</strong>
+                    <span>View the registered employee list.</span>
+                </a>
+
+                <a class="quick-action"
+                   asp-controller="AdminApproval"
+                   asp-action="AdminApprovalPageLoad">
+                    <strong>✓ Admin Approvals</strong>
+                    <span>Review pending admin registration requests.</span>
+                </a>
+
+                <a class="quick-action"
+                   asp-controller="AdminApproval"
+                   asp-action="AdminLeaveApprovalPageLoad">
+                    <strong>Leave Approvals</strong>
+                    <span>Review, approve, or reject employee leave applications.</span>
+                </a>
+
+                <a class="quick-action"
+                   asp-controller="Login"
+                   asp-action="LoginPageLoad">
+                    <strong>↪ Login Page</strong>
+                    <span>Return to the login screen.</span>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Admin Overview</h2>
+        </div>
+
+        <div class="panel-body">
+            <div class="balance-item">
+                <div class="balance-label">
+                    <span>Employee records</span>
+                    <strong>@totalEmployees</strong>
+                </div>
+            </div>
+
+            <div class="balance-item">
+                <div class="balance-label">
+                    <span>Leaves awaiting review</span>
+                    <strong>@pendingLeaves</strong>
+                </div>
+            </div>
+
+            <div class="balance-item">
+                <div class="balance-label">
+                    <span>Admin requests awaiting review</span>
+                    <strong>@pendingAdmins</strong>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Pending Admin Registrations</h2>
+        <a asp-controller="AdminApproval"
+           asp-action="AdminApprovalPageLoad">
+            View all →
+        </a>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Admin Name</th>
+                    <th>Email</th>
+                    <th>Requested At</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (pendingAdminRequests.Rows.Count > 0)
+                {
+                    int shown = 0;
+
+                    foreach (DataRow request in pendingAdminRequests.Rows)
+                    {
+                        if (shown >= 3)
+                        {
+                            break;
+                        }
+
+                        <tr>
+                            <td>@request["AdminName"]</td>
+                            <td>@request["Email"]</td>
+                            <td>
+                                @Convert.ToDateTime(request["RequestedAt"])
+                                .ToString("dd MMM yyyy")
+                            </td>
+                            <td>
+                                <span class="status-badge status-pending">
+                                    Pending
+                                </span>
+                            </td>
+                        </tr>
+
+                        shown++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4">
+                            No pending admin registration requests.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

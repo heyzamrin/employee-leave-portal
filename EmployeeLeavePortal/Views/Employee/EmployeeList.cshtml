@@ -1,0 +1,334 @@
+﻿```cshtml
+@model IEnumerable<EmployeeLeavePortal.Models.EmployeeClass>
+
+@{
+    ViewData["Title"] = "Employee List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var employees = Model?.ToList()
+        ?? new List<EmployeeLeavePortal.Models.EmployeeClass>();
+}
+
+<div class="approval-page employee-list-only">
+
+    <div class="approval-header">
+        <div>
+            <p class="approval-label">EMPLOYEE MANAGEMENT</p>
+            <h2>Employee Directory</h2>
+            <p class="approval-subtitle">
+                View and manage your registered employee records.
+            </p>
+        </div>
+
+        <a asp-controller="Employee"
+           asp-action="EmployeeInsertPageLoad"
+           class="register-button">
+            + Register Employee
+        </a>
+    </div>
+
+    <div class="approval-card">
+
+        <div class="employee-card-heading">
+            <div>
+                <h3>Employee Records</h3>
+                <p>Employee details and joining information</p>
+            </div>
+
+            <span class="employee-count">
+                @employees.Count employees
+            </span>
+        </div>
+
+        @if (employees.Count == 0)
+        {
+            <div class="empty-card">
+                <h3>No employees yet</h3>
+                <p>Register an employee to see their details here.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-wrapper">
+                <table class="approval-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Employee Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Joining Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var employee in employees)
+                        {
+                            <tr>
+                                <td class="employee-id">
+                                    #@employee.EmpId
+                                </td>
+
+                                <td class="employee-name">
+                                    @employee.EmpName
+                                </td>
+
+                                <td class="employee-email">
+                                    @employee.Email
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(employee.Department))
+                                    {
+                                        <span class="department-badge">
+                                            @employee.Department
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="not-assigned">
+                                            Not assigned
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @employee.JoiningDate.ToString("dd MMM yyyy")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="employee-footer">
+        Employee Leave Portal · Employee Management
+    </div>
+
+</div>
+
+<style>
+    /* Scoped styles: Employee List page only */
+    .employee-list-only {
+        padding: 30px;
+        min-height: 75vh;
+        background: #f5f7fb !important;
+        color: #172554;
+        border-radius: 16px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+        .employee-list-only .approval-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            background: transparent !important;
+        }
+
+        .employee-list-only .approval-label {
+            color: #4f46e5;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .employee-list-only .approval-header h2 {
+            font-size: 27px;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: #172554;
+        }
+
+        .employee-list-only .approval-subtitle {
+            color: #64748b;
+            margin: 0;
+        }
+
+        .employee-list-only .register-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #4f46e5;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background 0.2s ease;
+        }
+
+            .employee-list-only .register-button:hover {
+                background: #4338ca;
+                color: white;
+                text-decoration: none;
+            }
+
+        .employee-list-only .approval-card,
+        .employee-list-only .empty-card {
+            background: white !important;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .employee-list-only .employee-card-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+            .employee-list-only .employee-card-heading h3 {
+                font-size: 17px;
+                font-weight: 700;
+                margin: 0 0 6px;
+                color: #172554;
+            }
+
+            .employee-list-only .employee-card-heading p {
+                color: #64748b;
+                font-size: 13px;
+                margin: 0;
+            }
+
+        .employee-list-only .employee-count {
+            display: inline-block;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .employee-list-only .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .employee-list-only .approval-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+            .employee-list-only .approval-table th {
+                background: #f8fafc;
+                color: #475569;
+                text-align: left;
+                font-size: 13px;
+                font-weight: 600;
+                padding: 15px 12px;
+                border-bottom: 1px solid #e2e8f0;
+                white-space: nowrap;
+            }
+
+            .employee-list-only .approval-table td {
+                padding: 16px 12px;
+                border-bottom: 1px solid #edf0f5;
+                font-size: 14px;
+                color: #475569;
+                transition: background 0.18s ease;
+            }
+
+            .employee-list-only .approval-table tbody tr:hover td {
+                background: #edf0f7;
+            }
+
+            .employee-list-only .approval-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+        .employee-list-only .employee-id {
+            color: #64748b;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .employee-list-only .employee-name {
+            color: #172554;
+            font-weight: 600;
+        }
+
+        .employee-list-only .employee-email {
+            overflow-wrap: anywhere;
+        }
+
+        .employee-list-only .department-badge {
+            display: inline-block;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .employee-list-only .not-assigned {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .employee-list-only .empty-card {
+            text-align: center;
+            padding: 55px 20px;
+        }
+
+            .employee-list-only .empty-card h3 {
+                color: #172554;
+                margin: 0 0 8px;
+            }
+
+            .employee-list-only .empty-card p {
+                color: #64748b;
+                margin: 0;
+            }
+
+        .employee-list-only .employee-footer {
+            margin-top: 16px;
+            color: #94a3b8;
+            font-size: 11px;
+            text-align: right;
+            background: transparent;
+        }
+
+    @@media (max-width: 768px) {
+        .employee-list-only {
+            padding: 18px;
+        }
+
+            .employee-list-only .approval-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+                .employee-list-only .approval-header h2 {
+                    font-size: 22px;
+                }
+
+            .employee-list-only .register-button {
+                width: 100%;
+            }
+
+            .employee-list-only .approval-card {
+                padding: 15px;
+            }
+
+            .employee-list-only .employee-card-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+    }
+</style>
+```

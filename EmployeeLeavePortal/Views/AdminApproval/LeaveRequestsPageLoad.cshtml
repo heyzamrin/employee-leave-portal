@@ -1,0 +1,153 @@
+﻿@using System
+@using System.Data
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = ViewBag.PageTitle ?? "Leave Requests";
+
+    DataTable applications =
+        ViewBag.LeaveApplications as DataTable
+        ?? new DataTable();
+
+    string pageTitle =
+        Convert.ToString(ViewBag.PageTitle) ?? "Leave Requests";
+}
+
+<div class="page-heading">
+    <div>
+        <h1>@pageTitle</h1>
+        <p>Review employee leave application details.</p>
+    </div>
+
+    <a class="btn btn-primary"
+       asp-controller="AdminApproval"
+       asp-action="AdminDashboardPageLoad">
+        Back to Dashboard
+    </a>
+</div>
+
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-info">
+        @TempData["msg"]
+    </div>
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Leave Applications</h2>
+        <span>@applications.Rows.Count request(s)</span>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Email</th>
+                    <th>Leave Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Reason</th>
+                    <th>Applied On</th>
+                    <th>Status</th>
+                    @if (pageTitle == "Pending Leave Requests")
+                    {
+                        <th>Action</th>
+                    }
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (applications.Rows.Count > 0)
+                {
+                    foreach (DataRow item in applications.Rows)
+                    {
+                        <tr>
+                            <td>@item["EmpName"]</td>
+                            <td>@item["Email"]</td>
+                            <td>@item["LeaveTypeName"]</td>
+
+                            <td>
+                                @(Convert.ToDateTime(item["FromDate"])
+                                                        .ToString("dd MMM yyyy"))
+                                                                             </td>
+
+                            <td>
+                                @(Convert.ToDateTime(item["ToDate"])
+                                                        .ToString("dd MMM yyyy"))
+                                                                             </td>
+
+                            <td>@item["Reason"]</td>
+
+                            <td>
+                                @(Convert.ToDateTime(item["AppliedDate"])
+                                                        .ToString("dd MMM yyyy"))
+                    </td>
+
+                            <td>@item["Status"]</td>
+
+                    @if (pageTitle == "Pending Leave Requests")
+                            {
+                                <td>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <form asp-controller="AdminApproval"
+                                              asp-action="ApproveLeave"
+                                              method="post">
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="leaveId"
+                                                   value="@item["LeaveId"]" />
+
+                                            <button type="submit"
+                                                    class="btn btn-primary"
+                                                    onclick="return confirm('Approve this leave request?');">
+                                                Approve
+                                            </button>
+                                        </form>
+
+                                        <form asp-controller="AdminApproval"
+                                              asp-action="RejectLeave"
+                                              method="post">
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="leaveId"
+                                                   value="@item["LeaveId"]" />
+
+                                            <button type="submit"
+                                                    class="btn btn-danger"
+                                                    onclick="return confirm('Reject this leave request?');">
+                                                Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+                else
+                {
+                    int columnCount =
+                    pageTitle == "Pending Leave Requests" ? 9 : 8;
+
+                    <tr>
+                        <td colspan="@columnCount"
+                            style="text-align:center; padding:24px;">
+                            No leave requests found for this status.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

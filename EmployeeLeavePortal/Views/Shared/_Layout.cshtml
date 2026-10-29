@@ -1,0 +1,188 @@
+﻿@using System.Security.Claims
+
+@{
+    var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    var isEmployee = role == "Employee";
+    var isAdmin = role == "Admin";
+
+    var dashboardController = isEmployee
+        ? "EmployeeDashboard"
+        : isAdmin
+            ? "AdminApproval"
+            : "Home";
+
+    var dashboardAction = isEmployee
+        ? "EmployeeDashboardPageLoad"
+        : isAdmin
+            ? "AdminDashboardPageLoad"
+            : "Index";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - LDLeaveDesk</title>
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+</head>
+
+<body>
+    <div class="app-shell">
+
+        <!-- Sidebar -->
+        <aside class="app-sidebar">
+
+            <a class="sidebar-brand"
+               asp-controller="@dashboardController"
+               asp-action="@dashboardAction">
+
+                <span class="brand-icon">LD</span>
+
+                <span>
+                    <strong>LeaveDesk</strong>
+                    <small>EMPLOYEE MANAGEMENT</small>
+                </span>
+            </a>
+
+            <div class="sidebar-label">WORKSPACE</div>
+
+            <nav class="sidebar-nav">
+
+                @if (isEmployee)
+                {
+                    <a class="sidebar-link @(currentController == "EmployeeDashboard" && currentAction == "EmployeeDashboardPageLoad" ? "active" : "")"
+                       asp-controller="EmployeeDashboard"
+                       asp-action="EmployeeDashboardPageLoad">
+                        <span class="nav-icon">⌂</span>
+                        Dashboard
+                    </a>
+
+                    <a class="sidebar-link @(currentAction == "MyLeaveBalance" ? "active" : "")"
+                       asp-controller="EmployeeDashboard"
+                       asp-action="MyLeaveBalance">
+                        <span class="nav-icon">▤</span>
+                        My Leave Balance
+                    </a>
+
+                    <a class="sidebar-link @(currentAction == "ApplyForLeave" ? "active" : "")"
+                       asp-controller="EmployeeDashboard"
+                       asp-action="ApplyForLeave">
+                        <span class="nav-icon">＋</span>
+                        Apply for Leave
+                    </a>
+
+                    <a class="sidebar-link @(currentAction == "MyLeaveRequests" ? "active" : "")"
+                       asp-controller="EmployeeDashboard"
+                       asp-action="MyLeaveRequests">
+                        <span class="nav-icon">☷</span>
+                        My Leave Requests
+                    </a>
+
+                    <a class="sidebar-link @(currentAction == "MyProfile" ? "active" : "")"
+                       asp-controller="EmployeeDashboard"
+                       asp-action="MyProfile">
+                        <span class="nav-icon">♙</span>
+                        My Profile
+                    </a>
+                }
+                else if (isAdmin)
+                {
+                    <a class="sidebar-link @(currentController == "AdminApproval" && currentAction == "AdminDashboardPageLoad" ? "active" : "")"
+                       asp-controller="AdminApproval"
+                       asp-action="AdminDashboardPageLoad">
+                        <span class="nav-icon">⌂</span>
+                        Dashboard
+                    </a>
+
+                    <a class="sidebar-link @(currentController == "Employee" && currentAction == "EmployeeList" ? "active" : "")"
+                       asp-controller="Employee"
+                       asp-action="EmployeeList">
+                        <span class="nav-icon">♙</span>
+                        Employees
+                    </a>
+
+                    <a class="sidebar-link @(currentController == "Employee" && currentAction == "EmployeeInsertPageLoad" ? "active" : "")"
+                       asp-controller="Employee"
+                       asp-action="EmployeeInsertPageLoad">
+                        <span class="nav-icon">＋</span>
+                        Register Employee
+                    </a>
+                }
+
+            </nav>
+
+            <!-- Sidebar bottom -->
+            <div class="sidebar-bottom">
+
+                <div class="sidebar-help">
+                    <span class="help-icon">i</span>
+
+                    <div>
+                        <strong>Need help?</strong>
+                        <small>Manage your workspace</small>
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    Employee Leave Desk<br />
+                    <span>People first. Work better.</span>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="app-main">
+
+            <!-- Top bar -->
+            <header class="app-topbar">
+
+                <div>
+                    <div class="topbar-eyebrow">
+                        @(isEmployee ? "EMPLOYEE WORKSPACE" : isAdmin ? "ADMIN WORKSPACE" : "WORKSPACE")
+                    </div>
+
+                    <div class="topbar-heading">
+                        @(ViewData["Title"] ?? "Dashboard")
+                    </div>
+                </div>
+
+                <!-- Email removed -->
+                <div class="topbar-status">
+                    <span class="status-dot"></span>
+                    @(isEmployee ? "Employee" : isAdmin ? "Administrator" : "Workspace")
+                </div>
+
+            </header>
+
+            <!-- Page content -->
+            <section class="page-content">
+                @RenderBody()
+            </section>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <span>© 2026 Employee Leave Desk</span>
+                <span>Designed for better workdays.</span>
+
+                <a asp-controller="Login"
+                   asp-action="LogoutClick">
+                    Logout
+                </a>
+            </footer>
+
+        </main>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

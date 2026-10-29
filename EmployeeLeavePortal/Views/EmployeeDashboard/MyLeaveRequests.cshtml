@@ -1,0 +1,590 @@
+﻿@using System
+@using System.Data
+
+@{
+    ViewData["Title"] = "My Leave Requests";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    DataTable applications =
+        ViewBag.LeaveApplications as DataTable ?? new DataTable();
+
+    int total = applications.Rows.Count;
+    int pending = 0;
+    int approved = 0;
+    int rejected = 0;
+
+    foreach (DataRow row in applications.Rows)
+    {
+        string status = Convert.ToString(row["Status"]) ?? "";
+
+        if (status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+        {
+            pending++;
+        }
+        else if (status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+        {
+            approved++;
+        }
+        else if (status.Equals("Rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            rejected++;
+        }
+    }
+}
+
+<style>
+    .requests-page {
+        color: #e5eaf5;
+        padding: 28px 0 40px;
+    }
+
+    .requests-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+
+    .requests-eyebrow {
+        color: #a99cff;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .requests-heading h2 {
+        color: #f1f5ff;
+        font-size: clamp(25px, 3vw, 32px);
+        font-weight: 750;
+        letter-spacing: -0.8px;
+        margin: 0 0 8px;
+    }
+
+    .requests-subtitle {
+        color: #94a3bd;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .requests-apply-btn {
+        background: linear-gradient(135deg, #8170ff, #6354e8);
+        border: 1px solid #8170ff;
+        color: #fff;
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-weight: 650;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: .2s ease;
+    }
+
+        .requests-apply-btn:hover {
+            background: linear-gradient(135deg, #9587ff, #7566f4);
+            border-color: #9587ff;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .request-stat {
+        height: 100%;
+        padding: 20px;
+        background: #0c1427;
+        border: 1px solid #263451;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, .12);
+        transition: transform .2s ease, border-color .2s ease;
+    }
+
+        .request-stat:hover {
+            transform: translateY(-3px);
+            border-color: #4a4c80;
+        }
+
+    .request-stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .request-stat-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #a5b1c8;
+    }
+
+    .request-stat-icon {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .stat-total .request-stat-icon {
+        background: rgba(129, 112, 255, .16);
+        color: #a99cff;
+    }
+
+    .stat-pending .request-stat-icon {
+        background: rgba(245, 183, 74, .14);
+        color: #f5c46b;
+    }
+
+    .stat-approved .request-stat-icon {
+        background: rgba(52, 211, 153, .13);
+        color: #54ddb0;
+    }
+
+    .stat-rejected .request-stat-icon {
+        background: rgba(248, 113, 113, .13);
+        color: #ff9292;
+    }
+
+    .request-stat-number {
+        font-size: 30px;
+        line-height: 1;
+        font-weight: 750;
+        letter-spacing: -1px;
+        color: #f1f5ff;
+    }
+
+    .request-stat-note {
+        color: #8391aa;
+        font-size: 12px;
+        line-height: 1.6;
+        margin-top: 9px;
+    }
+
+    .requests-table-card {
+        background: #0c1427;
+        border: 1px solid #263451;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 5px 22px rgba(0, 0, 0, .12);
+        margin-top: 26px;
+    }
+
+    .requests-table-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #263451;
+    }
+
+        .requests-table-header h5 {
+            color: #edf2ff;
+            margin: 0 0 5px;
+            font-weight: 750;
+            font-size: 17px;
+        }
+
+        .requests-table-header p {
+            margin: 0;
+            font-size: 13px;
+            color: #94a3bd;
+            line-height: 1.6;
+        }
+
+    .requests-count {
+        background: rgba(129, 112, 255, .15);
+        color: #b6aaff;
+        border: 1px solid rgba(129, 112, 255, .2);
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .requests-table {
+        min-width: 850px;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        --bs-table-bg: transparent;
+        --bs-table-color: #d8e0f0;
+        --bs-table-border-color: #263451;
+        --bs-table-hover-bg: rgba(129, 112, 255, .06);
+        --bs-table-hover-color: #f1f5ff;
+    }
+
+        .requests-table thead th {
+            background: #101b31;
+            color: #9baac4;
+            border-bottom: 1px solid #263451;
+            padding: 15px 18px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .65px;
+            white-space: nowrap;
+        }
+
+        .requests-table tbody td {
+            padding: 18px;
+            border-bottom: 1px solid #202d45;
+            vertical-align: middle;
+            font-size: 13px;
+            color: #c4cee0;
+            background: transparent;
+        }
+
+        .requests-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .requests-table tbody tr:hover td {
+            background: rgba(129, 112, 255, .055);
+        }
+
+    .request-id {
+        font-weight: 750;
+        color: #a99cff;
+        white-space: nowrap;
+    }
+
+    .request-leave-type {
+        font-weight: 700;
+        color: #edf2ff;
+        white-space: nowrap;
+    }
+
+    .request-date {
+        white-space: nowrap;
+        color: #c4cee0;
+    }
+
+    .requests-table .text-muted {
+        color: #8492aa !important;
+    }
+
+    .request-reason {
+        max-width: 180px;
+        overflow-wrap: anywhere;
+        color: #c4cee0;
+        line-height: 1.6;
+    }
+
+    .request-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border-radius: 20px;
+        padding: 7px 11px;
+        font-size: 11px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+        .request-status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+    .status-pending {
+        background: rgba(245, 183, 74, .13);
+        color: #f5c46b;
+        border: 1px solid rgba(245, 183, 74, .18);
+    }
+
+    .status-approved {
+        background: rgba(52, 211, 153, .12);
+        color: #54ddb0;
+        border: 1px solid rgba(52, 211, 153, .18);
+    }
+
+    .status-rejected {
+        background: rgba(248, 113, 113, .12);
+        color: #ff9292;
+        border: 1px solid rgba(248, 113, 113, .18);
+    }
+
+    .status-other {
+        background: #1a2740;
+        color: #b0bdd2;
+        border: 1px solid #2b3a56;
+    }
+
+    .requests-empty {
+        text-align: center;
+        padding: 58px 20px;
+    }
+
+    .requests-empty-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 18px;
+        border-radius: 22px;
+        background: rgba(129, 112, 255, .15);
+        color: #a99cff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 29px;
+    }
+
+    .requests-empty h5 {
+        font-weight: 750;
+        color: #edf2ff;
+        margin-bottom: 8px;
+    }
+
+    .requests-empty p {
+        color: #94a3bd;
+        font-size: 14px;
+        margin-bottom: 22px;
+        line-height: 1.7;
+    }
+
+    .requests-alert {
+        border-radius: 11px;
+        margin-bottom: 20px;
+    }
+
+    .requests-page .alert-success {
+        color: #75e0b8;
+        background: rgba(52, 211, 153, .1);
+        border: 1px solid rgba(52, 211, 153, .25);
+    }
+
+    .requests-page .alert-danger {
+        color: #ff9292;
+        background: rgba(248, 113, 113, .1);
+        border: 1px solid rgba(248, 113, 113, .25);
+    }
+
+    @@media (max-width: 576px) {
+        .requests-page {
+            padding-top: 18px;
+        }
+
+        .requests-heading {
+            align-items: stretch;
+        }
+
+        .requests-apply-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .requests-table-header {
+            padding: 18px;
+        }
+
+        .request-stat {
+            padding: 16px;
+        }
+
+        .request-stat-number {
+            font-size: 26px;
+        }
+
+        .requests-empty {
+            padding: 42px 18px;
+        }
+    }
+</style>
+
+<div class="container-fluid requests-page">
+
+    <div class="requests-heading">
+        <div>
+            <div class="requests-eyebrow">Employee self-service</div>
+            <h2>My Leave Requests</h2>
+            <p class="requests-subtitle">
+                Track your leave applications and stay updated on their status.
+            </p>
+        </div>
+
+        <a asp-controller="EmployeeDashboard"
+           asp-action="ApplyForLeave"
+           class="requests-apply-btn">
+            <span aria-hidden="true">+</span>
+            Apply for Leave
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success requests-alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row g-3">
+        <div class="col-6 col-xl-3">
+            <div class="request-stat stat-total">
+                <div class="request-stat-top">
+                    <span class="request-stat-label">Total Requests</span>
+                    <span class="request-stat-icon">▤</span>
+                </div>
+                <div class="request-stat-number">@total</div>
+                <div class="request-stat-note">All applications submitted</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="request-stat stat-pending">
+                <div class="request-stat-top">
+                    <span class="request-stat-label">Pending</span>
+                    <span class="request-stat-icon">◷</span>
+                </div>
+                <div class="request-stat-number">@pending</div>
+                <div class="request-stat-note">Waiting for a decision</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="request-stat stat-approved">
+                <div class="request-stat-top">
+                    <span class="request-stat-label">Approved</span>
+                    <span class="request-stat-icon">✓</span>
+                </div>
+                <div class="request-stat-number">@approved</div>
+                <div class="request-stat-note">Applications approved</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="request-stat stat-rejected">
+                <div class="request-stat-top">
+                    <span class="request-stat-label">Rejected</span>
+                    <span class="request-stat-icon">×</span>
+                </div>
+                <div class="request-stat-number">@rejected</div>
+                <div class="request-stat-note">Applications declined</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="requests-table-card">
+        <div class="requests-table-header">
+            <div>
+                <h5>Application History</h5>
+                <p>Review the details of your submitted leave requests.</p>
+            </div>
+
+            <span class="requests-count">
+                @total @(total == 1 ? "request" : "requests")
+            </span>
+        </div>
+
+        @if (applications.Rows.Count > 0)
+        {
+            <div class="table-responsive">
+                <table class="table requests-table">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Leave Type</th>
+                            <th>Leave Period</th>
+                            <th>Reason</th>
+                            <th>Applied On</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (DataRow row in applications.Rows)
+                        {
+                            string status =
+                            Convert.ToString(row["Status"]) ?? "Pending";
+
+                            string badgeClass = "status-other";
+
+                            if (status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeClass = "status-pending";
+                            }
+                            else if (status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeClass = "status-approved";
+                            }
+                            else if (status.Equals("Rejected", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeClass = "status-rejected";
+                            }
+
+                            <tr>
+                                <td>
+                                    <span class="request-id">
+                                        #@row["LeaveId"]
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="request-leave-type">
+                                        @row["LeaveTypeName"]
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="request-date">
+                                        @Convert.ToDateTime(row["FromDate"]).ToString("dd MMM yyyy")
+                                    </div>
+                                    <div class="text-muted small mt-1">
+                                        to @Convert.ToDateTime(row["ToDate"]).ToString("dd MMM yyyy")
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="request-reason">
+                                        @row["Reason"]
+                                    </div>
+                                </td>
+
+                                <td class="request-date">
+                                    @Convert.ToDateTime(row["AppliedDate"]).ToString("dd MMM yyyy")
+                                </td>
+
+                                <td>
+                                    <span class="request-status @badgeClass">
+                                        @status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="requests-empty">
+                <div class="requests-empty-icon">▤</div>
+                <h5>No leave requests yet</h5>
+                <p>
+                    Your submitted applications will appear here.
+                    Start by applying for your first leave.
+                </p>
+
+                <a asp-controller="EmployeeDashboard"
+                   asp-action="ApplyForLeave"
+                   class="requests-apply-btn">
+                    + Apply for Leave
+                </a>
+            </div>
+        }
+    </div>
+
+</div>

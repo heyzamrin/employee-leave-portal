@@ -1,0 +1,272 @@
+﻿@using System
+@using System.Data
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dashboard";
+
+    DataTable leaveBalances = ViewBag.LeaveBalances as DataTable;
+    DataTable leaveApplications = ViewBag.LeaveApplications as DataTable;
+
+    int totalAllowance = 0;
+    int daysUsed = 0;
+    int pendingRequests = 0;
+    int availableBalance = 0;
+
+    if (leaveBalances != null)
+    {
+        foreach (DataRow balance in leaveBalances.Rows)
+        {
+            totalAllowance += Convert.ToInt32(balance["TotalDays"]);
+        }
+    }
+
+    if (leaveApplications != null)
+    {
+        foreach (DataRow application in leaveApplications.Rows)
+        {
+            string status = Convert.ToString(application["Status"]);
+
+            if (status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+            {
+                pendingRequests++;
+            }
+
+            if (status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+            {
+                DateTime fromDate = Convert.ToDateTime(application["FromDate"]);
+                DateTime toDate = Convert.ToDateTime(application["ToDate"]);
+
+                daysUsed += (toDate.Date - fromDate.Date).Days + 1;
+            }
+        }
+    }
+
+    availableBalance = totalAllowance - daysUsed;
+
+    if (availableBalance < 0)
+    {
+        availableBalance = 0;
+    }
+}
+
+<div class="page-heading">
+    <div>
+        <h1>My Dashboard</h1>
+        <p>Here is your leave overview.</p>
+    </div>
+
+    <a class="btn btn-primary"
+       asp-controller="EmployeeDashboard"
+       asp-action="ApplyForLeave">
+        + Apply for Leave
+    </a>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-top">
+            Total Leave Allowance
+            <span class="stat-icon">▤</span>
+        </div>
+        <div class="stat-number">@totalAllowance</div>
+        <div class="stat-note">Across all leave types</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            Leave Days Used
+            <span class="stat-icon">✓</span>
+        </div>
+        <div class="stat-number">@daysUsed</div>
+        <div class="stat-note">Approved leave days only</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            Pending Requests
+            <span class="stat-icon">◷</span>
+        </div>
+        <div class="stat-number">@pendingRequests</div>
+        <div class="stat-note">Awaiting review</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            Available Balance
+            <span class="stat-icon">◉</span>
+        </div>
+        <div class="stat-number">@availableBalance</div>
+        <div class="stat-note">Remaining leave days</div>
+    </div>
+</div>
+
+<div class="content-grid">
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Recent Leave Requests</h2>
+            <a asp-controller="EmployeeDashboard"
+               asp-action="MyLeaveRequests">View all →</a>
+        </div>
+
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Leave Type</th>
+                        <th>Dates</th>
+                        <th>Days</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (leaveApplications != null && leaveApplications.Rows.Count > 0)
+                    {
+                        int shown = 0;
+
+                        foreach (DataRow application in leaveApplications.Rows)
+                        {
+                            if (shown >= 3)
+                            {
+                                break;
+                            }
+
+                            DateTime fromDate = Convert.ToDateTime(application["FromDate"]);
+                            DateTime toDate = Convert.ToDateTime(application["ToDate"]);
+                            int leaveDays = (toDate.Date - fromDate.Date).Days + 1;
+                            string status = Convert.ToString(application["Status"]);
+                            string statusClass = "status-pending";
+
+                            if (status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+                            {
+                                statusClass = "status-approved";
+                            }
+                            else if (status.Equals("Rejected", StringComparison.OrdinalIgnoreCase))
+                            {
+                                statusClass = "status-rejected";
+                            }
+
+                            <tr>
+                                <td>@application["LeaveTypeName"]</td>
+                                <td>
+                                    @fromDate.ToString("dd MMM yyyy")
+                                    @if (fromDate.Date != toDate.Date)
+                                    {
+                                        <span> – @toDate.ToString("dd MMM yyyy")</span>
+                                    }
+                                </td>
+                                <td>@leaveDays</td>
+                                <td>
+                                    <span class="status-badge @statusClass">@status</span>
+                                </td>
+                            </tr>
+
+                            shown++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">You have not submitted any leave requests yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Leave Balance</h2>
+            <a asp-controller="EmployeeDashboard"
+               asp-action="MyLeaveBalance">Details →</a>
+        </div>
+
+        <div class="panel-body">
+            @if (leaveBalances != null && leaveBalances.Rows.Count > 0)
+            {
+                foreach (DataRow balance in leaveBalances.Rows)
+                {
+                    int leaveTypeId = Convert.ToInt32(balance["LeaveTypeId"]);
+                    string leaveTypeName = Convert.ToString(balance["LeaveTypeName"]);
+                    int allowance = Convert.ToInt32(balance["TotalDays"]);
+                    int typeDaysUsed = 0;
+
+                    if (leaveApplications != null)
+                    {
+                        foreach (DataRow application in leaveApplications.Rows)
+                        {
+                            string status = Convert.ToString(application["Status"]);
+                            int applicationLeaveTypeId = Convert.ToInt32(application["LeaveTypeId"]);
+
+                            if (applicationLeaveTypeId == leaveTypeId &&
+                            status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+                            {
+                                DateTime fromDate = Convert.ToDateTime(application["FromDate"]);
+                                DateTime toDate = Convert.ToDateTime(application["ToDate"]);
+
+                                typeDaysUsed += (toDate.Date - fromDate.Date).Days + 1;
+                            }
+                        }
+                    }
+
+                    int typeAvailable = allowance - typeDaysUsed;
+
+                    if (typeAvailable < 0)
+                    {
+                        typeAvailable = 0;
+                    }
+
+                    int percentage = allowance > 0
+                    ? (int)Math.Round((double)typeAvailable / allowance * 100)
+                    : 0;
+
+                    <div class="balance-item">
+                        <div class="balance-label">
+                            <span>@leaveTypeName</span>
+                            <strong>@typeAvailable / @allowance days left</strong>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: @percentage%"></div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>Leave balance information is not available.</p>
+            }
+        </div>
+    </section>
+</div>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Quick Actions</h2>
+    </div>
+
+    <div class="panel-body">
+        <div class="quick-actions">
+            <a class="quick-action"
+               asp-controller="EmployeeDashboard"
+               asp-action="ApplyForLeave">
+                <strong>＋ Apply for Leave</strong>
+                <span>Submit a new leave request.</span>
+            </a>
+
+            <a class="quick-action"
+               asp-controller="EmployeeDashboard"
+               asp-action="MyLeaveRequests">
+                <strong>☷ My Leave Requests</strong>
+                <span>Track the status of your applications.</span>
+            </a>
+
+            <a class="quick-action"
+               asp-controller="EmployeeDashboard"
+               asp-action="MyProfile">
+                <strong>♙ My Profile</strong>
+                <span>View your employee information.</span>
+            </a>
+        </div>
+    </div>
+</section>

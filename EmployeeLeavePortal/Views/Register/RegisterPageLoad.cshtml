@@ -1,0 +1,301 @@
+﻿@model EmployeeLeavePortal.Models.RegisterViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Register - LDLeaveDesk";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - LDLeaveDesk</title>
+
+    <style>
+        :root {
+            --bg: #080f1f;
+            --card: #0c1427;
+            --border: #263451;
+            --text: #f4f6ff;
+            --muted: #a4b2d0;
+            --violet: #8170ff;
+            --violet-light: #a99cff;
+            --danger: #ff8c9b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 28px 16px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 460px;
+            padding: 34px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
+            border-radius: 14px;
+            background: var(--violet);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .brand p {
+            margin: 9px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .field {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            outline: none;
+            background: #080f1f;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+            input:focus, select:focus {
+                border-color: var(--violet);
+                box-shadow: 0 0 0 3px rgba(129, 112, 255, 0.12);
+            }
+
+            select option {
+                background: var(--card);
+                color: var(--text);
+            }
+
+        .hint {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .validation {
+            display: block;
+            margin-top: 6px;
+            color: var(--danger);
+            font-size: 12px;
+        }
+
+        .validation-summary {
+            margin-bottom: 16px;
+            color: var(--danger);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .error-message {
+            margin-bottom: 16px;
+            color: var(--danger);
+            font-size: 13px;
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 5px;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            background: var(--violet);
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .submit-button:hover {
+                background: var(--violet-light);
+                color: #080f1f;
+            }
+
+        .footer {
+            margin-top: 22px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        a {
+            color: var(--violet-light);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+        @@media (max-width: 480px) {
+            .register-card {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="register-card">
+        <div class="brand">
+            <div class="brand-mark">L</div>
+            <h1>Create your account</h1>
+            <p>Join LDLeaveDesk to manage employee leave</p>
+        </div>
+
+        <form asp-controller="Register"
+              asp-action="RegisterClick"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All"
+                 class="validation-summary"></div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="error-message">@ViewBag.Error</div>
+            }
+
+            <div class="field">
+                <label asp-for="Name">Full name</label>
+                <input asp-for="Name"
+                       placeholder="Enter your full name"
+                       autocomplete="name" />
+                <span asp-validation-for="Name"
+                      class="validation"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Email">Email address</label>
+                <input asp-for="Email"
+                       type="email"
+                       placeholder="you@example.com"
+                       autocomplete="email" />
+                <span asp-validation-for="Email"
+                      class="validation"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password"
+                       type="password"
+                       placeholder="At least 6 characters"
+                       autocomplete="new-password" />
+                <span asp-validation-for="Password"
+                      class="validation"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="ConfirmPassword">Confirm password</label>
+                <input asp-for="ConfirmPassword"
+                       type="password"
+                       placeholder="Re-enter your password"
+                       autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword"
+                      class="validation"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="AccountType">Account type</label>
+                <select asp-for="AccountType" id="accountType">
+                    <option value="Employee">Employee</option>
+                    <option value="AdminRequest">Company / Admin request</option>
+                </select>
+                <span asp-validation-for="AccountType"
+                      class="validation"></span>
+
+                <p class="hint" id="accountHint">
+                    Employee accounts can be created directly.
+                </p>
+            </div>
+
+            <div class="field" id="departmentField">
+                <label asp-for="Department">Department</label>
+                <input asp-for="Department"
+                       placeholder="e.g. IT, HR, Finance" />
+                <span asp-validation-for="Department"
+                      class="validation"></span>
+            </div>
+
+            <button type="submit" class="submit-button">
+                Create account
+            </button>
+        </form>
+
+        <div class="footer">
+            Already have an account?
+            <a asp-controller="Login"
+               asp-action="LoginPageLoad">Sign in</a>
+        </div>
+    </main>
+
+    <script>
+        const accountType = document.getElementById("accountType");
+        const departmentField = document.getElementById("departmentField");
+        const accountHint = document.getElementById("accountHint");
+
+        function updateAccountFields() {
+            if (accountType.value === "AdminRequest") {
+                departmentField.style.display = "none";
+                accountHint.textContent =
+                    "Admin access requires verification and approval.";
+            } else {
+                departmentField.style.display = "block";
+                accountHint.textContent =
+                    "Your employee account will be created after registration.";
+            }
+        }
+
+        accountType.addEventListener("change", updateAccountFields);
+        updateAccountFields();
+    </script>
+</body>
+</html>

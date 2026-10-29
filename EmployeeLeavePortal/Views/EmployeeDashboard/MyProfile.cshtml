@@ -1,0 +1,448 @@
+﻿@using System.Security.Claims
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "My Profile";
+
+    var employeeName = User.Identity?.Name ?? "Employee";
+    var employeeEmail = User.FindFirst(ClaimTypes.Email)?.Value
+                        ?? "Not available";
+
+    var employeeInitial = string.IsNullOrWhiteSpace(employeeName)
+        ? "E"
+        : employeeName.Substring(0, 1).ToUpperInvariant();
+}
+
+<style>
+    .profile-page {
+        color: #e5eaf5;
+        padding: 28px 0 40px;
+    }
+
+    .profile-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+
+    .profile-eyebrow {
+        color: #a99cff;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .profile-heading h1 {
+        color: #f1f5ff;
+        font-size: clamp(26px, 3vw, 32px);
+        font-weight: 750;
+        letter-spacing: -0.8px;
+        margin: 0 0 8px;
+    }
+
+    .profile-heading p {
+        color: #94a3bd;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .profile-panel {
+        background: #0c1427;
+        border: 1px solid #263451;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 5px 22px rgba(0, 0, 0, .12);
+    }
+
+    .profile-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 22px 26px;
+        border-bottom: 1px solid #263451;
+    }
+
+        .profile-panel-header h2 {
+            color: #edf2ff;
+            font-size: 18px;
+            font-weight: 750;
+            margin: 0;
+        }
+
+    .profile-panel-body {
+        padding: 28px;
+    }
+
+    .profile-identity {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 30px;
+        padding: 22px;
+        background: #101b31;
+        border: 1px solid #263451;
+        border-radius: 14px;
+    }
+
+    .profile-avatar {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #8170ff, #5546ce);
+        color: #fff;
+        font-size: 27px;
+        font-weight: 800;
+        box-shadow: 0 7px 18px rgba(99, 84, 232, .2);
+    }
+
+    .profile-identity h2 {
+        color: #f1f5ff;
+        font-size: 21px;
+        font-weight: 750;
+        margin: 0 0 7px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-identity p {
+        color: #94a3bd;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .profile-identity-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: #b6aaff;
+        font-size: 11px;
+        font-weight: 750;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        margin-top: 10px;
+    }
+
+        .profile-identity-label::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #54ddb0;
+        }
+
+    .profile-section-title {
+        color: #edf2ff;
+        font-size: 14px;
+        font-weight: 750;
+        margin: 0 0 18px;
+    }
+
+    .profile-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+        margin-bottom: 26px;
+    }
+
+    .profile-field {
+        min-width: 0;
+    }
+
+        .profile-field label {
+            display: block;
+            color: #a5b1c8;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        .profile-field .form-control {
+            min-height: 46px;
+            width: 100%;
+            color: #dce5f5;
+            background: #101b31;
+            border: 1px solid #30405e;
+            border-radius: 9px;
+            padding: 11px 14px;
+            font-size: 13px;
+            box-shadow: none;
+            opacity: 1;
+            -webkit-text-fill-color: #dce5f5;
+        }
+
+            .profile-field .form-control:disabled,
+            .profile-field .form-control[readonly] {
+                color: #c4cee0;
+                background: #101b31;
+                border-color: #2a3955;
+                opacity: 1;
+                -webkit-text-fill-color: #c4cee0;
+            }
+
+            .profile-field .form-control:focus {
+                border-color: #8170ff;
+                box-shadow: 0 0 0 3px rgba(129, 112, 255, .12);
+            }
+
+    .profile-field-hint {
+        color: #7788a5;
+        font-size: 11px;
+        margin-top: 7px;
+    }
+
+    .profile-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 18px;
+        margin-bottom: 25px;
+        color: #b6c3dc;
+        background: rgba(129, 112, 255, .09);
+        border: 1px solid rgba(129, 112, 255, .22);
+        border-radius: 11px;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .profile-notice-icon {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: rgba(129, 112, 255, .17);
+        color: #b6aaff;
+        font-weight: 800;
+    }
+
+    .profile-notice strong {
+        display: block;
+        color: #e0dafe;
+        margin-bottom: 3px;
+    }
+
+    .profile-actions {
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-top: 22px;
+        border-top: 1px solid #263451;
+    }
+
+    .profile-back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 43px;
+        padding: 11px 17px;
+        color: #e0e7f5;
+        background: #17243b;
+        border: 1px solid #354663;
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+        .profile-back-btn:hover {
+            color: #fff;
+            background: #22314d;
+            border-color: #526486;
+            transform: translateY(-1px);
+        }
+
+    .profile-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 11px;
+        color: #54ddb0;
+        background: rgba(52, 211, 153, .11);
+        border: 1px solid rgba(52, 211, 153, .2);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+        .profile-status-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+    @@media (max-width: 767px) {
+        .profile-page {
+            padding-top: 18px;
+        }
+
+        .profile-panel-header {
+            padding: 18px;
+        }
+
+        .profile-panel-body {
+            padding: 18px;
+        }
+
+        .profile-identity {
+            padding: 17px;
+        }
+
+        .profile-form-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+    }
+
+    @@media (max-width: 420px) {
+        .profile-avatar {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            font-size: 23px;
+        }
+
+        .profile-identity h2 {
+            font-size: 17px;
+        }
+
+        .profile-actions,
+        .profile-back-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container-fluid profile-page">
+
+    <div class="profile-heading">
+        <div>
+            <div class="profile-eyebrow">Employee self-service</div>
+            <h1>My Profile</h1>
+            <p>View your employee account information.</p>
+        </div>
+    </div>
+
+    <section class="profile-panel">
+
+        <div class="profile-panel-header">
+            <h2>Personal Information</h2>
+
+            <span class="profile-status-badge">
+                Signed In
+            </span>
+        </div>
+
+        <div class="profile-panel-body">
+
+            <div class="profile-identity">
+
+                <div class="profile-avatar">
+                    @employeeInitial
+                </div>
+
+                <div>
+                    <h2>@employeeName</h2>
+                    <p>Employee Account</p>
+
+                    <div class="profile-identity-label">
+                        Account Active
+                    </div>
+                </div>
+
+            </div>
+
+            <h3 class="profile-section-title">
+                Account Details
+            </h3>
+
+            <div class="profile-form-grid">
+
+                <div class="profile-field">
+                    <label for="EmployeeName">Employee Name</label>
+
+                    <input id="EmployeeName"
+                           class="form-control"
+                           value="@employeeName"
+                           readonly />
+                </div>
+
+                <div class="profile-field">
+                    <label for="EmployeeEmail">Email Address</label>
+
+                    <input id="EmployeeEmail"
+                           class="form-control"
+                           value="@employeeEmail"
+                           readonly />
+                </div>
+
+                <div class="profile-field">
+                    <label for="Department">Department</label>
+
+                    <input id="Department"
+                           class="form-control"
+                           value="Not loaded yet"
+                           readonly />
+
+                    <div class="profile-field-hint">
+                        Department information is not connected yet.
+                    </div>
+                </div>
+
+                <div class="profile-field">
+                    <label for="JoiningDate">Joining Date</label>
+
+                    <input id="JoiningDate"
+                           class="form-control"
+                           value="Not loaded yet"
+                           readonly />
+
+                    <div class="profile-field-hint">
+                        Joining date information is not connected yet.
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="profile-notice">
+                <div class="profile-notice-icon">i</div>
+
+                <div>
+                    <strong>About your profile</strong>
+                    Your name and email are displayed from your current
+                    login information where available. Department and
+                    joining date will need to be connected to your employee
+                    database before they can be displayed here.
+                </div>
+            </div>
+
+            <div class="profile-actions">
+
+                <a class="profile-back-btn"
+                   asp-controller="EmployeeDashboard"
+                   asp-action="EmployeeDashboardPageLoad">
+                    <span aria-hidden="true">←</span>
+                    Back to Dashboard
+                </a>
+
+            </div>
+
+        </div>
+    </section>
+
+</div>

@@ -1,0 +1,458 @@
+﻿@model EmployeeLeavePortal.Models.EmployeeClass
+
+@{
+    ViewData["Title"] = "Register Employee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .registration-page {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .registration-heading {
+        margin-bottom: 24px;
+    }
+
+        .registration-heading h1 {
+            margin: 0;
+            color: #172554;
+            font-size: 28px;
+            font-weight: 750;
+        }
+
+        .registration-heading p {
+            margin: 9px 0 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+    .registration-card {
+        display: grid;
+        grid-template-columns: 0.8fr 1.2fr;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+    }
+
+    .registration-intro {
+        padding: 34px 28px;
+        background: #f8faff;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    .registration-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 24px;
+        border-radius: 12px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .registration-eyebrow {
+        margin: 0 0 12px;
+        color: #4f46e5;
+        font-size: 10px;
+        font-weight: 750;
+        letter-spacing: 1.8px;
+    }
+
+    .registration-intro h2 {
+        margin: 0 0 14px;
+        color: #172554;
+        font-size: 25px;
+        line-height: 1.4;
+    }
+
+    .registration-intro > p:not(.registration-eyebrow) {
+        margin: 0 0 26px;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .registration-feature {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .registration-feature-icon {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 27px;
+        height: 27px;
+        border: 1px solid #c7d2fe;
+        border-radius: 50%;
+        background: #eef2ff;
+        color: #4338ca;
+        font-size: 12px;
+    }
+
+    .registration-feature strong {
+        display: block;
+        margin: 2px 0 6px;
+        color: #172554;
+        font-size: 13px;
+    }
+
+    .registration-feature p {
+        margin: 0;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .registration-form-panel {
+        min-width: 0;
+        padding: 34px 32px;
+    }
+
+    .registration-form-heading {
+        margin-bottom: 24px;
+    }
+
+        .registration-form-heading h2 {
+            margin: 0 0 8px;
+            color: #172554;
+            font-size: 21px;
+            font-weight: 750;
+        }
+
+        .registration-form-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+    .registration-message {
+        margin-bottom: 18px;
+        padding: 13px 15px;
+        border: 1px solid #bbf7d0;
+        border-radius: 9px;
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .registration-validation {
+        margin-bottom: 16px;
+        color: #b91c1c;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+        .registration-validation:empty {
+            display: none;
+        }
+
+        .registration-validation ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+    .registration-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 18px;
+    }
+
+    .registration-field {
+        min-width: 0;
+    }
+
+        .registration-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .registration-field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+    .registration-input {
+        display: block;
+        width: 100%;
+        min-height: 45px;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        outline: none;
+        background: #ffffff;
+        color: #172554;
+        font-family: inherit;
+        font-size: 13px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .registration-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .registration-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+
+        .registration-input option {
+            background: #ffffff;
+            color: #172554;
+        }
+
+    .registration-field .field-error {
+        display: block;
+        margin-top: 6px;
+        color: #b91c1c;
+        font-size: 11px;
+    }
+
+    .registration-submit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 46px;
+        margin-top: 25px;
+        padding: 12px 18px;
+        border: 1px solid #4f46e5;
+        border-radius: 9px;
+        background: #4f46e5;
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+        .registration-submit:hover {
+            border-color: #4338ca;
+            background: #4338ca;
+        }
+
+        .registration-submit span {
+            font-size: 17px;
+        }
+
+    .registration-note {
+        margin: 14px 0 0;
+        color: #94a3b8;
+        font-size: 11px;
+        line-height: 1.7;
+        text-align: center;
+    }
+
+    @@media (max-width: 800px) {
+        .registration-card {
+            grid-template-columns: 1fr;
+        }
+
+        .registration-intro {
+            padding: 26px;
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+            .registration-intro h2 {
+                font-size: 23px;
+            }
+
+        .registration-form-panel {
+            padding: 28px 24px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .registration-heading h1 {
+            font-size: 25px;
+        }
+
+        .registration-form-panel {
+            padding: 24px 18px;
+        }
+
+        .registration-grid {
+            grid-template-columns: 1fr;
+            gap: 17px;
+        }
+
+        .registration-field.full-width {
+            grid-column: auto;
+        }
+    }
+</style>
+
+<div class="registration-page">
+
+    <div class="registration-heading">
+        <h1>Register Employee</h1>
+        <p>Add a new employee to your Employee Leave Portal.</p>
+    </div>
+
+    <div class="registration-card">
+
+        <!-- Introduction panel -->
+        <section class="registration-intro">
+            <div class="registration-brand">LD</div>
+
+            <p class="registration-eyebrow">EMPLOYEE MANAGEMENT</p>
+
+            <h2>Build a better workplace.</h2>
+
+            <p>
+                Keep employee information organized in one place
+                and make employee management easier.
+            </p>
+
+            <div class="registration-feature">
+                <span class="registration-feature-icon">✓</span>
+                <div>
+                    <strong>Simple registration</strong>
+                    <p>Enter employee details in one convenient form.</p>
+                </div>
+            </div>
+
+            <div class="registration-feature">
+                <span class="registration-feature-icon">✓</span>
+                <div>
+                    <strong>Organized records</strong>
+                    <p>Maintain employee contact and joining information.</p>
+                </div>
+            </div>
+
+            <div class="registration-feature">
+                <span class="registration-feature-icon">✓</span>
+                <div>
+                    <strong>Leave management</strong>
+                    <p>Keep employee records ready for leave management.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration form -->
+        <section class="registration-form-panel">
+
+            <div class="registration-form-heading">
+                <h2>Create employee record</h2>
+                <p>Enter the employee's details below.</p>
+            </div>
+
+            @if (TempData["msg"] != null)
+            {
+                <div class="registration-message" role="status">
+                    @TempData["msg"]
+                </div>
+            }
+
+            <div asp-validation-summary="All"
+                 class="registration-validation"></div>
+
+            <form asp-controller="Employee"
+                  asp-action="EmployeeInsertClick"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="registration-grid">
+
+                    <div class="registration-field">
+                        <label asp-for="EmpName">Employee name</label>
+                        <input asp-for="EmpName"
+                               class="registration-input"
+                               placeholder="Enter full name"
+                               autocomplete="name"
+                               required />
+                        <span asp-validation-for="EmpName"
+                              class="field-error"></span>
+                    </div>
+
+                    <div class="registration-field">
+                        <label asp-for="Email">Email address</label>
+                        <input asp-for="Email"
+                               type="email"
+                               class="registration-input"
+                               placeholder="name@company.com"
+                               autocomplete="email"
+                               required />
+                        <span asp-validation-for="Email"
+                              class="field-error"></span>
+                    </div>
+
+                    <div class="registration-field">
+                        <label asp-for="PasswordHash">Password</label>
+                        <input asp-for="PasswordHash"
+                               type="password"
+                               class="registration-input"
+                               placeholder="Enter a password"
+                               autocomplete="new-password"
+                               required />
+                        <span asp-validation-for="PasswordHash"
+                              class="field-error"></span>
+                    </div>
+
+                    <div class="registration-field">
+                        <label asp-for="Department">Department</label>
+                        <select asp-for="Department"
+                                class="registration-input">
+                            <option value="">Select department</option>
+                            <option value="IT">IT</option>
+                            <option value="HR">Human Resources</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Administration">Administration</option>
+                        </select>
+                        <span asp-validation-for="Department"
+                              class="field-error"></span>
+                    </div>
+
+                    <div class="registration-field full-width">
+                        <label asp-for="JoiningDate">Joining date</label>
+                        <input asp-for="JoiningDate"
+                               type="date"
+                               class="registration-input"
+                               required />
+                        <span asp-validation-for="JoiningDate"
+                              class="field-error"></span>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="registration-submit">
+                    Register employee
+                    <span aria-hidden="true">→</span>
+                </button>
+
+                <p class="registration-note">
+                    Please check the employee details before submitting.
+                </p>
+
+            </form>
+        </section>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

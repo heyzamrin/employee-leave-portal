@@ -1,0 +1,596 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "My Leave Balance";
+}
+
+<style>
+    .balance-page {
+        color: #e5eaf5;
+        padding: 28px 0 40px;
+    }
+
+    .balance-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+
+    .balance-eyebrow {
+        color: #a99cff;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .balance-heading h1 {
+        color: #f1f5ff;
+        font-size: clamp(26px, 3vw, 32px);
+        font-weight: 750;
+        letter-spacing: -0.8px;
+        margin: 0 0 8px;
+    }
+
+    .balance-heading p {
+        color: #94a3bd;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .balance-apply-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border: 1px solid #8170ff;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #8170ff, #6354e8);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .balance-apply-btn:hover {
+            background: linear-gradient(135deg, #9587ff, #7566f4);
+            border-color: #9587ff;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .balance-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 26px;
+    }
+
+    .balance-stat-card {
+        min-width: 0;
+        padding: 21px;
+        background: #0c1427;
+        border: 1px solid #263451;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, .12);
+        transition: transform .2s ease, border-color .2s ease;
+    }
+
+        .balance-stat-card:hover {
+            transform: translateY(-3px);
+            border-color: #4a4c80;
+        }
+
+    .balance-stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 20px;
+        color: #a5b1c8;
+        font-size: 12px;
+        font-weight: 650;
+    }
+
+    .balance-stat-icon {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .balance-stat-total .balance-stat-icon {
+        background: rgba(129, 112, 255, .16);
+        color: #a99cff;
+    }
+
+    .balance-stat-used .balance-stat-icon {
+        background: rgba(248, 113, 113, .12);
+        color: #ff9292;
+    }
+
+    .balance-stat-remaining .balance-stat-icon {
+        background: rgba(52, 211, 153, .12);
+        color: #54ddb0;
+    }
+
+    .balance-stat-types .balance-stat-icon {
+        background: rgba(96, 165, 250, .13);
+        color: #82b8ff;
+    }
+
+    .balance-stat-number {
+        color: #f1f5ff;
+        font-size: 32px;
+        line-height: 1.1;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    .balance-stat-note {
+        color: #8391aa;
+        font-size: 12px;
+        line-height: 1.6;
+        margin-top: 9px;
+    }
+
+    .balance-panel {
+        overflow: hidden;
+        background: #0c1427;
+        border: 1px solid #263451;
+        border-radius: 16px;
+        box-shadow: 0 5px 22px rgba(0, 0, 0, .12);
+    }
+
+    .balance-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #263451;
+    }
+
+        .balance-panel-header h2 {
+            color: #edf2ff;
+            font-size: 17px;
+            font-weight: 750;
+            margin: 0 0 6px;
+        }
+
+        .balance-panel-header p {
+            color: #94a3bd;
+            font-size: 13px;
+            margin: 0;
+        }
+
+    .balance-demo-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 11px;
+        border: 1px solid rgba(129, 112, 255, .2);
+        border-radius: 8px;
+        background: rgba(129, 112, 255, .12);
+        color: #b6aaff;
+        font-size: 11px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .balance-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .balance-table {
+        width: 100%;
+        min-width: 650px;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        --bs-table-bg: transparent;
+        --bs-table-color: #d8e0f0;
+        --bs-table-border-color: #263451;
+        --bs-table-hover-bg: rgba(129, 112, 255, .06);
+        --bs-table-hover-color: #f1f5ff;
+    }
+
+        .balance-table thead th {
+            padding: 16px 20px;
+            background: #101b31;
+            color: #9baac4;
+            border-bottom: 1px solid #263451;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            white-space: nowrap;
+        }
+
+        .balance-table tbody td {
+            padding: 20px;
+            color: #c4cee0;
+            font-size: 13px;
+            vertical-align: middle;
+            border-bottom: 1px solid #202d45;
+            background: transparent;
+        }
+
+        .balance-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .balance-table tbody tr:hover td {
+            background: rgba(129, 112, 255, .055);
+        }
+
+    .balance-type-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #edf2ff;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .balance-type-icon {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(129, 112, 255, .14);
+        color: #b6aaff;
+        font-size: 15px;
+        font-weight: 750;
+    }
+
+    .balance-number {
+        color: #dce5f5;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .balance-number-available {
+        color: #54ddb0;
+    }
+
+    .balance-usage {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 130px;
+    }
+
+    .balance-progress-track {
+        height: 7px;
+        flex: 1;
+        min-width: 65px;
+        overflow: hidden;
+        background: #202d45;
+        border-radius: 20px;
+    }
+
+    .balance-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #8170ff, #b1a5ff);
+        border-radius: 20px;
+        transition: width .3s ease;
+    }
+
+    .balance-usage-label {
+        min-width: 43px;
+        color: #a5b1c8;
+        font-size: 11px;
+        font-weight: 700;
+        text-align: right;
+    }
+
+    .balance-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .balance-footer-note {
+        color: #8391aa;
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .balance-back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 17px;
+        min-height: 43px;
+        color: #e0e7f5;
+        background: #17243b;
+        border: 1px solid #354663;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .balance-back-btn:hover {
+            color: #fff;
+            background: #22314d;
+            border-color: #526486;
+            transform: translateY(-1px);
+        }
+
+    @@media (max-width: 1100px) {
+        .balance-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .balance-page {
+            padding-top: 18px;
+        }
+
+        .balance-heading {
+            align-items: stretch;
+        }
+
+        .balance-apply-btn {
+            width: 100%;
+        }
+
+        .balance-stats {
+            gap: 12px;
+        }
+
+        .balance-stat-card {
+            padding: 16px;
+        }
+
+        .balance-stat-top {
+            align-items: flex-start;
+            font-size: 11px;
+            margin-bottom: 16px;
+        }
+
+        .balance-stat-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .balance-stat-number {
+            font-size: 27px;
+        }
+
+        .balance-panel-header {
+            padding: 18px;
+        }
+
+        .balance-table tbody td {
+            padding: 16px;
+        }
+
+        .balance-footer {
+            align-items: stretch;
+        }
+
+        .balance-back-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container-fluid balance-page">
+
+    <div class="balance-heading">
+        <div>
+            <div class="balance-eyebrow">Employee self-service</div>
+            <h1>My Leave Balance</h1>
+            <p>Review your leave allowance and remaining days.</p>
+        </div>
+
+        <a class="balance-apply-btn"
+           asp-controller="EmployeeDashboard"
+           asp-action="ApplyForLeave">
+            <span aria-hidden="true">+</span>
+            Apply for Leave
+        </a>
+    </div>
+
+    <div class="balance-stats">
+
+        <div class="balance-stat-card balance-stat-total">
+            <div class="balance-stat-top">
+                <span>Total Allowance</span>
+                <span class="balance-stat-icon">▤</span>
+            </div>
+            <div class="balance-stat-number">37</div>
+            <div class="balance-stat-note">
+                Days per allowance configuration
+            </div>
+        </div>
+
+        <div class="balance-stat-card balance-stat-used">
+            <div class="balance-stat-top">
+                <span>Days Used</span>
+                <span class="balance-stat-icon">✓</span>
+            </div>
+            <div class="balance-stat-number">8</div>
+            <div class="balance-stat-note">
+                Sample value
+            </div>
+        </div>
+
+        <div class="balance-stat-card balance-stat-remaining">
+            <div class="balance-stat-top">
+                <span>Days Remaining</span>
+                <span class="balance-stat-icon">◉</span>
+            </div>
+            <div class="balance-stat-number">29</div>
+            <div class="balance-stat-note">
+                Sample value
+            </div>
+        </div>
+
+        <div class="balance-stat-card balance-stat-types">
+            <div class="balance-stat-top">
+                <span>Leave Types</span>
+                <span class="balance-stat-icon">▦</span>
+            </div>
+            <div class="balance-stat-number">3</div>
+            <div class="balance-stat-note">
+                Casual, Sick and Earned
+            </div>
+        </div>
+
+    </div>
+
+    <section class="balance-panel">
+
+        <div class="balance-panel-header">
+            <div>
+                <h2>Leave Balance Details</h2>
+                <p>Review your allowance, used days and available balance.</p>
+            </div>
+
+            <span class="balance-demo-badge">
+                Illustrative data
+            </span>
+        </div>
+
+        <div class="balance-table-wrap">
+            <table class="table balance-table">
+
+                <thead>
+                    <tr>
+                        <th>Leave Type</th>
+                        <th>Total Days</th>
+                        <th>Used Days</th>
+                        <th>Available Days</th>
+                        <th>Usage</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="balance-type-cell">
+                                <span class="balance-type-icon">C</span>
+                                Casual Leave
+                            </div>
+                        </td>
+                        <td>
+                            <span class="balance-number">12</span>
+                        </td>
+                        <td>
+                            <span class="balance-number">4</span>
+                        </td>
+                        <td>
+                            <span class="balance-number balance-number-available">8</span>
+                        </td>
+                        <td>
+                            <div class="balance-usage">
+                                <div class="balance-progress-track">
+                                    <div class="balance-progress-fill"
+                                         style="width:33.33%">
+                                    </div>
+                                </div>
+                                <span class="balance-usage-label">33.33%</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="balance-type-cell">
+                                <span class="balance-type-icon">S</span>
+                                Sick Leave
+                            </div>
+                        </td>
+                        <td>
+                            <span class="balance-number">10</span>
+                        </td>
+                        <td>
+                            <span class="balance-number">2</span>
+                        </td>
+                        <td>
+                            <span class="balance-number balance-number-available">8</span>
+                        </td>
+                        <td>
+                            <div class="balance-usage">
+                                <div class="balance-progress-track">
+                                    <div class="balance-progress-fill"
+                                         style="width:20%">
+                                    </div>
+                                </div>
+                                <span class="balance-usage-label">20%</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="balance-type-cell">
+                                <span class="balance-type-icon">E</span>
+                                Earned Leave
+                            </div>
+                        </td>
+                        <td>
+                            <span class="balance-number">15</span>
+                        </td>
+                        <td>
+                            <span class="balance-number">2</span>
+                        </td>
+                        <td>
+                            <span class="balance-number balance-number-available">13</span>
+                        </td>
+                        <td>
+                            <div class="balance-usage">
+                                <div class="balance-progress-track">
+                                    <div class="balance-progress-fill"
+                                         style="width:13.33%">
+                                    </div>
+                                </div>
+                                <span class="balance-usage-label">13.33%</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </section>
+
+    <div class="balance-footer">
+        <p class="balance-footer-note">
+            Note: The displayed leave balances are sample values and are not
+            connected to live leave records yet.
+        </p>
+
+        <a class="balance-back-btn"
+           asp-controller="EmployeeDashboard"
+           asp-action="EmployeeDashboardPageLoad">
+            <span aria-hidden="true">←</span>
+            Back to Dashboard
+        </a>
+    </div>
+
+</div>

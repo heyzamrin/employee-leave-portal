@@ -1,0 +1,415 @@
+﻿@model EmployeeLeavePortal.Models.LoginViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - LDLeaveDesk</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #080f1f;
+            --card: #0c1427;
+            --border: #263451;
+            --text: #f4f6ff;
+            --muted: #a4b2d0;
+            --violet: #8170ff;
+            --violet-light: #a99cff;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at 15% 15%, rgba(129, 112, 255, 0.13), transparent 35%), radial-gradient(circle at 90% 85%, rgba(80, 92, 180, 0.12), transparent 35%), var(--bg);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            padding: 38px;
+            background: linear-gradient(145deg, #0e172b, #0b1324);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35), 0 0 35px rgba(129, 112, 255, 0.05);
+        }
+
+        .brand-area {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .brand-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #9182ff, #6554df);
+            border: 1px solid rgba(190, 182, 255, 0.4);
+            box-shadow: 0 8px 25px rgba(111, 91, 255, 0.25);
+            color: white;
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .brand {
+            margin: 0;
+            color: #f7f8ff;
+            font-size: 27px;
+            font-weight: 750;
+            letter-spacing: -0.7px;
+        }
+
+            .brand span {
+                color: var(--violet-light);
+            }
+
+        .subtitle {
+            margin: 9px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .welcome-heading {
+            margin-bottom: 23px;
+        }
+
+            .welcome-heading h2 {
+                margin: 0 0 6px;
+                color: #f4f6ff;
+                font-size: 20px;
+                letter-spacing: -0.3px;
+            }
+
+            .welcome-heading p {
+                margin: 0;
+                color: #8f9fbe;
+                font-size: 13px;
+            }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            color: #dce5fa;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        input, select {
+            display: block;
+            width: 100%;
+            min-height: 46px;
+            padding: 12px 13px;
+            border: 1px solid #30405f;
+            border-radius: 9px;
+            outline: none;
+            background: #0a1325;
+            color: #f4f6ff;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            input::placeholder {
+                color: #7182a4;
+            }
+
+            input:focus, select:focus {
+                border-color: var(--violet);
+                box-shadow: 0 0 0 3px rgba(129, 112, 255, 0.14);
+            }
+
+        select {
+            cursor: pointer;
+        }
+
+            select option {
+                background: #0c1427;
+                color: #f4f6ff;
+            }
+
+        .password-wrap {
+            position: relative;
+        }
+
+            .password-wrap input {
+                padding-right: 65px;
+            }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            padding: 5px 2px;
+            border: none;
+            background: transparent;
+            color: var(--violet-light);
+            font-size: 12px;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+            .password-toggle:hover {
+                color: #d0c9ff;
+            }
+
+        .login-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 47px;
+            margin-top: 8px;
+            padding: 12px 16px;
+            border: 1px solid #8b7cff;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #9182ff, #6c5ce7);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 7px 22px rgba(111, 91, 255, 0.2);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+
+            .login-button:hover {
+                background: linear-gradient(135deg, #a296ff, #7a6cf0);
+                box-shadow: 0 9px 26px rgba(111, 91, 255, 0.3);
+                transform: translateY(-1px);
+            }
+
+            .login-button:active {
+                transform: translateY(0);
+            }
+
+        .error {
+            display: block;
+            margin: 6px 0 0;
+            color: #ff9bab;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .validation-summary-errors {
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 99, 125, 0.3);
+            border-radius: 9px;
+            background: rgba(190, 48, 73, 0.12);
+        }
+
+            .validation-summary-errors ul {
+                margin: 0;
+                padding-left: 18px;
+            }
+
+        .validation-summary-valid {
+            display: none;
+        }
+
+        .register-prompt {
+            margin-top: 22px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .register-link {
+            color: var(--violet-light);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+            .register-link:hover {
+                color: #d0c9ff;
+                text-decoration: underline;
+            }
+
+        .security-note {
+            margin-top: 17px;
+            color: #8191b1;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 27px;
+            padding-top: 19px;
+            border-top: 1px solid #1d2942;
+            text-align: center;
+            color: #8291b0;
+            font-size: 11px;
+        }
+
+        @@media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .login-card {
+                padding: 28px 22px;
+                border-radius: 15px;
+            }
+
+            .brand {
+                font-size: 24px;
+            }
+
+            .brand-icon {
+                width: 52px;
+                height: 52px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="login-card">
+
+        <header class="brand-area">
+            <div class="brand-icon" aria-hidden="true">LD</div>
+
+            <h1 class="brand">
+                LD<span>LeaveDesk</span>
+            </h1>
+
+            <p class="subtitle">
+                Employee Leave Management System
+            </p>
+        </header>
+
+        <div class="welcome-heading">
+            <h2>Welcome back</h2>
+            <p>Sign in to access your leave dashboard.</p>
+        </div>
+
+        @if (TempData["RegisterMessage"] != null)
+        {
+            <div style="margin-bottom:18px; padding:12px; border:1px solid #365b50; border-radius:9px; background:#10291f; color:#a7f3d0; font-size:13px; line-height:1.5;">
+                @TempData["RegisterMessage"]
+            </div>
+        }
+
+        <form asp-controller="Login"
+              asp-action="LoginClick"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All" class="error"></div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="error" role="alert">
+                    @ViewBag.Error
+                </div>
+            }
+
+            <div class="field">
+                <label asp-for="Email">Email Address</label>
+
+                <input asp-for="Email"
+                       type="email"
+                       placeholder="Enter your email address"
+                       autocomplete="username"
+                       required />
+
+                <span asp-validation-for="Email" class="error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Password">Password</label>
+
+                <div class="password-wrap">
+                    <input asp-for="Password"
+                           id="loginPassword"
+                           type="password"
+                           placeholder="Enter your password"
+                           autocomplete="current-password"
+                           required />
+
+                    <button type="button"
+                            class="password-toggle"
+                            id="togglePassword"
+                            aria-controls="loginPassword"
+                            aria-pressed="false">
+                        Show
+                    </button>
+                </div>
+
+                <span asp-validation-for="Password" class="error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Role">Login As</label>
+
+                <select asp-for="Role" required>
+                    <option value="Employee">Employee</option>
+                    <option value="Admin">Admin</option>
+                </select>
+
+                <span asp-validation-for="Role" class="error"></span>
+            </div>
+
+            <button type="submit" class="login-button">
+                Sign In <span aria-hidden="true">&nbsp; →</span>
+            </button>
+
+        </form>
+
+        <div class="register-prompt">
+            Don't have an account?
+            <a asp-controller="Register"
+               asp-action="RegisterPageLoad"
+               class="register-link">Create an account</a>
+        </div>
+
+        <div class="security-note">
+            Secure access to your employee account
+        </div>
+
+        <footer class="footer">
+            © 2026 LDLeaveDesk. All rights reserved.
+        </footer>
+
+    </main>
+
+    <script>
+        const passwordInput = document.getElementById("loginPassword");
+        const togglePassword = document.getElementById("togglePassword");
+
+        togglePassword.addEventListener("click", function () {
+            const isPasswordHidden = passwordInput.type === "password";
+
+            passwordInput.type = isPasswordHidden ? "text" : "password";
+            togglePassword.textContent = isPasswordHidden ? "Hide" : "Show";
+            togglePassword.setAttribute("aria-pressed", String(isPasswordHidden));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+﻿@using System
+@using System.Data
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Leave Approvals";
+
+    DataTable applications =
+        ViewBag.LeaveApplications as DataTable
+        ?? new DataTable();
+}
+
+@if (ViewBag.DebugMessage != null)
+{
+    <div class="alert alert-info">
+        @ViewBag.DebugMessage
+    </div>
+}
+
+
+<div class="page-heading">
+    <div>
+        <h1>Leave Approvals</h1>
+        <p>Review and manage employee leave applications.</p>
+    </div>
+    <a class="btn btn-primary"
+       asp-controller="AdminApproval"
+       asp-action="AdminDashboardPageLoad">
+        Back to Dashboard
+    </a>
+</div>
+
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-info" role="alert">
+        @TempData["msg"]
+    </div>
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Employee Applications</h2>
+        <span>@applications.Rows.Count request(s)</span>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Leave Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Reason</th>
+                    <th>Applied On</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (applications.Rows.Count > 0)
+                {
+                    foreach (DataRow item in applications.Rows)
+                    {
+                        string status =
+                        Convert.ToString(item["Status"]) ?? "";
+
+                        <tr>
+                            <td>
+                                <strong>@item["EmpName"]</strong>
+                                <br />
+                                <small>@item["Email"]</small>
+                            </td>
+
+                            <td>@item["LeaveTypeName"]</td>
+
+                            <td>
+                                @Convert.ToDateTime(item["FromDate"])
+                                .ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @Convert.ToDateTime(item["ToDate"])
+                                .ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>@item["Reason"]</td>
+
+                            <td>
+                                @Convert.ToDateTime(item["AppliedDate"])
+                                .ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @if (status == "Pending")
+                                {
+                                    <span class="status-badge status-pending">
+                                        Pending
+                                    </span>
+                                }
+                                else if (status == "Approved")
+                                {
+                                    <span class="status-badge status-approved">
+                                        Approved
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-rejected">
+                                        @status
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (status == "Pending")
+                                {
+                                    <form asp-controller="AdminApproval"
+                                          asp-action="ApproveLeave"
+                                          method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden"
+                                               name="leaveId"
+                                               value="@item["LeaveId"]" />
+                                        <button type="submit"
+                                                class="btn btn-primary">
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    <form asp-controller="AdminApproval"
+                                          asp-action="RejectLeave"
+                                          method="post"
+                                          style="margin-top: 6px;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden"
+                                               name="leaveId"
+                                               value="@item["LeaveId"]" />
+                                        <button type="submit"
+                                                class="btn btn-danger">
+                                            Reject
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span>Action completed</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8">
+                            No leave applications found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
